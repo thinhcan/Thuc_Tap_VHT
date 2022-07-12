@@ -10,6 +10,7 @@ struct timespec tp;
 struct timespec ot = {{0,0}};
 
 long freq;
+ long old_freq = 0;
 struct timespec time1, time2;
 uint8_t kt = 0;
 
@@ -39,7 +40,7 @@ void *getFreq(void *args) {
 
  //long x = (*(long*)args);
  long new_freq = get_freq();
- long old_freq = freq; 
+
     if(old_freq == new_freq) {
           return NULL;
     }
