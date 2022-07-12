@@ -10,7 +10,6 @@ struct timespec tp;
 struct timespec ot = {{0,0}};
 
 long freq;
-long check_freq = 500000000;
 struct timespec time1, time2;
 uint8_t kt = 0;
 
@@ -23,6 +22,7 @@ long get_freq() {
  fgets(buff,sizeof(buff),fp);
  char *eptr;
  data = strtol(buff,&eptr,10);
+
  fclose(fp);
  return data;
  }
@@ -37,22 +37,22 @@ long get_freq() {
 
 void *getFreq(void *args) {
 
- long x = (*(long*)args);
- long old_freq = get_freq();
-
-    if(old_freq == x) {
+ //long x = (*(long*)args);
+ long new_freq = get_freq();
+ long old_freq = freq; 
+    if(old_freq == new_freq) {
           return NULL;
     }
     else {
-      FILE *fp;
-      fp = fopen("freq.txt","w");
-      fprintf(fp,"%ld",x);
-      fclose(fp);
-      freq = x;
+      // FILE *fp;
+      // fp = fopen("freq.txt","w");
+      // fprintf(fp,"%ld",x);
+      // fclose(fp);
+      freq = new_freq;
       time1.tv_sec = 0;
       time1.tv_nsec = freq;
 
-      check_freq = freq;
+       old_freq = new_freq;
     }
      return NULL;
 
@@ -112,14 +112,13 @@ int main(int argc, char const *argv[])
 
     while(1)
     {
-
         if(nanosleep(&time1 , &time2) < 0 ) {
         printf("Nano sleep system call failed \n");
         return -1;
       }
       else {
         //       printf(" chay ma nhi thread\n");
-          i = pthread_create(&INPUT,NULL,getFreq,&check_freq);
+          i = pthread_create(&INPUT,NULL,getFreq,NULL);
           s = pthread_create(&SAMPLE, NULL, getTime,&freq);
           l = pthread_create(&LOGGING,NULL,save_time,&tp);
 
