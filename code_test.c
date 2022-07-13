@@ -62,8 +62,8 @@ void *getFreq(void *args) {
 void *save_time(void *args)
 {
  struct timespec *nt = (struct timespec *)args;
- 
-    FILE *file;
+ if(nt->tv_nsec != ot.tv_nsec ||nt->tv_sec != ot.tv_sec ) {
+  FILE *file;
 
 
      file = fopen("time_and_interval.txt","a+");
@@ -85,12 +85,18 @@ void *save_time(void *args)
       diff_sec = diff_sec - 1;
     }
 
+ 
+
+   fprintf(file, "%ld.%09ld %ld.%09ld\n",nt->tv_sec,nt->tv_nsec,diff_sec,diff_nsec);
+   //     fprintf(file, "\nnew val : %ld.%09ld\nold val : %ld.%09ld\n", nt->tv_sec, nt->tv_nsec, ot.tv_sec , ot.tv_nsec );
+    fclose(file);
     ot.tv_nsec = nt->tv_nsec;
     ot.tv_sec = nt ->tv_sec;
 
-   fprintf(file, "%ld.%09ld\n%ld.%09ld\n",nt->tv_sec,nt->tv_nsec,diff_sec,diff_nsec);
-   //     fprintf(file, "\nnew val : %ld.%09ld\nold val : %ld.%09ld\n", nt->tv_sec, nt->tv_nsec, ot.tv_sec , ot.tv_nsec );
-    fclose(file);
+ } else {
+  return NULL;
+ }
+    
 
 
 
