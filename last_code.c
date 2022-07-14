@@ -18,10 +18,7 @@ void * sam_func(void *arg) {
 
                 request.tv_nsec += T; /* Sleep for 20 seconds from now */
                 clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &request, NULL);
-                
                 clock_gettime(CLOCK_MONOTONIC, &rtc);
-                printf("%ld,%ld\n",rtc.tv_sec,rtc.tv_nsec);
-                
         }
    return NULL;
 
@@ -29,7 +26,7 @@ void * sam_func(void *arg) {
 void * in_func(void *arg) {
         FILE *fp;
        while(1) {
-
+        
         
         fp = fopen("freq.txt","r");
         char buff[100];
@@ -44,8 +41,9 @@ void * in_func(void *arg) {
 
 }
 void    *log_func(void* arg) {
-        FILE *file;
+         FILE *file;
         while(1) {
+               
         if(rtc.tv_nsec != ot.tv_nsec ||rtc.tv_sec != ot.tv_sec ) {
         
 
