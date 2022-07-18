@@ -7,15 +7,10 @@
 
 
 pthread_mutex_t mtx = PTHREAD_MUTEX_INITIALIZER;  
-
-//pthread_mutex_t mtx_sample = PTHREAD_MUTEX_INITIALIZER;  
 pthread_cond_t  condition_sample = PTHREAD_COND_INITIALIZER;
-
-//pthread_mutex_t mtx_input = PTHREAD_MUTEX_INITIALIZER;  
 pthread_cond_t  condition_input = PTHREAD_COND_INITIALIZER;
 
-// pthread_mutex_t mtx_logging = PTHREAD_MUTEX_INITIALIZER;  
-// pthread_cond_t  condition_logging = PTHREAD_COND_INITIALIZER;
+
 
 static int sample_flag = 0;
 static int input_flag = 0;
@@ -33,21 +28,28 @@ void * sam_func(void *arg) {
         //chờ
     
        clock_gettime(CLOCK_MONOTONIC, &request);
-
+       
         while(1) {
 
-                pthread_mutex_lock(&mtx);
-                while(input_flag == 0) {
-                        pthread_cond_wait(&condition_input,&mtx);
+        pthread_mutex_lock(&mtx);
+        
+        while(input_flag == 0) {
+                pthread_cond_wait(&condition_input,&mtx);
+        }
+        
+        pthread_mutex_unlock(&mtx);
+
+                request.tv_nsec += T;
+                if(request. tv_nsec > 1000*1000*1000){
+                        request.tv_nsec -= 1000*1000*1000;
+                        request.tv_sec++;
                 }
-                pthread_mutex_unlock(&mtx);
-
-                request.tv_nsec += T; /* Sleep for 20 seconds from now */
+      // request.tv_nsec += T; /* Sleep for 20 seconds from now */
                 clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &request, NULL);
+              
                 clock_gettime(CLOCK_MONOTONIC, &rtc);
+
                 //printf("sam func\n");
-
-
                 pthread_mutex_lock(&mtx);
                 input_flag = 0;
                 sample_flag = 1;
@@ -151,8 +153,6 @@ request.tv_nsec = 0;
 pthread_create(&INPUT, NULL, &in_func, NULL); //Tạo luồng input
 pthread_create(&SAMPLE, NULL, &sam_func, NULL); //Tạo luồng sample
 pthread_create(&LOGIN, NULL, &log_func, NULL); //Tạo luồng login
-
-
 
 pthread_join(INPUT,NULL);
 pthread_join(SAMPLE,NULL);
