@@ -36,7 +36,8 @@ void * sam_func(void *arg) {
        clock_gettime(CLOCK_MONOTONIC, &request);
 
         while(1) {
-      //  printf("sam count %d\n",count_sam);
+
+     //  printf("sam count %d\n",count_sam);
 
         pthread_mutex_lock(&mtx);
         
@@ -104,70 +105,46 @@ void * in_func(void *arg) {
         return NULL;
 
 }
-void    *log_func(void* arg) {
-        
+void    *log_func(void* arg) {    
         while(1) {
-                
-        //printf("log count :%d\n",count_log);
-
         pthread_mutex_lock(&mtx);
-        
         while(sample_flag == 0) {
                 pthread_cond_wait(&condition_sample,&mtx);  
         }
- 
         input_flag = 0;
         sample_flag = 0;
-        //count_log ++;
-        
         pthread_mutex_unlock(&mtx);
-
-       
-
-
         if(rtc.tv_nsec != ot.tv_nsec ||rtc.tv_sec != ot.tv_sec ) {
-        
         file = fopen("time_and_interval.txt","a+");
-
         if(file == NULL) {
                 printf("ko mo dc file\n");
                 return NULL;
         }
-
         long diff_sec = (long)rtc.tv_sec - (long)ot.tv_sec ;
         long diff_nsec;
-        
         if(rtc.tv_nsec > ot.tv_nsec) {
                 diff_nsec = rtc.tv_nsec - ot.tv_nsec;
         }
-
         else {
                 diff_nsec = 1000000000 - ot.tv_nsec + rtc.tv_nsec;
                 diff_sec = diff_sec - 1;
         }        
         if(ot.tv_nsec != 0) {
                 //fprintf(file, "%ld.%09ld %ld.%09ld\n",rtc.tv_sec,rtc.tv_nsec,diff_sec,diff_nsec);
-                fprintf(file, "%ld,%09ld\n",diff_sec,diff_nsec);
+                //fprintf(file, "%ld,%09ld\n",diff_sec,diff_nsec);
+                fprintf(file, "%ld\n",diff_nsec);
         }
-     
         fclose(file);
         ot.tv_nsec = rtc.tv_nsec;
         ot.tv_sec = rtc.tv_sec;
-                
         }
-        
-        // pthread_mutex_lock(&mtx);
-        
-        // input_flag = 1;
-        // sample_flag = 0;
-        
-        // pthread_cond_signal(&condition_input);
-
-        // pthread_mutex_unlock(&mtx); 
-
+        pthread_mutex_lock(&mtx);
+        input_flag = 1;
+        sample_flag = 0;
+        pthread_cond_signal(&condition_input);
+        pthread_mutex_unlock(&mtx); 
         }
         return NULL;
-
 }
 int main(int argc, char** argv)
 {
