@@ -6,7 +6,7 @@ val=1000000
 # do
     > time_and_interval.txt
     echo  "$val" > "freq.txt"
-    timeout 5s ./code_test
+    timeout 60s ./code_test
 #     ((val/=10))
 #     ((i++))
     
