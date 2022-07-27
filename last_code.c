@@ -39,11 +39,11 @@ void * sam_func(void *arg) {
 
      //  printf("sam count %d\n",count_sam);
 
-        pthread_mutex_lock(&mtx);
+        // pthread_mutex_lock(&mtx);
         
-        while(input_flag == 0) {
-                pthread_cond_wait(&condition_input,&mtx);
-        }
+        // while(input_flag == 0) {
+        //         pthread_cond_wait(&condition_input,&mtx);
+        // }
         
         pthread_mutex_unlock(&mtx);
 
@@ -61,15 +61,15 @@ void * sam_func(void *arg) {
 
         
         
-        pthread_mutex_lock(&mtx);
+//         pthread_mutex_lock(&mtx);
         
-        input_flag = 0;
-        sample_flag = 1;
-       // count_sam ++;
+//         input_flag = 0;
+//         sample_flag = 1;
+//        // count_sam ++;
 
-        pthread_cond_signal(&condition_sample);
+//         pthread_cond_signal(&condition_sample);
 
-        pthread_mutex_unlock(&mtx);
+//         pthread_mutex_unlock(&mtx);
 
 
 
@@ -94,12 +94,12 @@ void * in_func(void *arg) {
         fclose(fp);
       
         
-        pthread_mutex_lock(&mtx);
-        input_flag = 1;
-        sample_flag = 0;
-       // count_in ++;
-        pthread_cond_signal(&condition_input);
-        pthread_mutex_unlock(&mtx);
+//         pthread_mutex_lock(&mtx);
+//         input_flag = 1;
+//         sample_flag = 0;
+//        // count_in ++;
+//         pthread_cond_signal(&condition_input);
+//         pthread_mutex_unlock(&mtx);
 
        }
         return NULL;
@@ -107,13 +107,14 @@ void * in_func(void *arg) {
 }
 void    *log_func(void* arg) {    
         while(1) {
-        pthread_mutex_lock(&mtx);
-        while(sample_flag == 0) {
-                pthread_cond_wait(&condition_sample,&mtx);  
-        }
-        input_flag = 0;
-        sample_flag = 0;
-        pthread_mutex_unlock(&mtx);
+        // pthread_mutex_lock(&mtx);
+        // while(sample_flag == 0) {
+        //         pthread_cond_wait(&condition_sample,&mtx);  
+        // }
+        // input_flag = 0;
+        // sample_flag = 0;
+        // pthread_mutex_unlock(&mtx);
+        
         if(rtc.tv_nsec != ot.tv_nsec ||rtc.tv_sec != ot.tv_sec ) {
         file = fopen("time_and_interval.txt","a+");
         if(file == NULL) {
@@ -130,19 +131,19 @@ void    *log_func(void* arg) {
                 diff_sec = diff_sec - 1;
         }        
         if(ot.tv_nsec != 0) {
-                //fprintf(file, "%ld.%09ld %ld.%09ld\n",rtc.tv_sec,rtc.tv_nsec,diff_sec,diff_nsec);
+                fprintf(file, "%ld.%09ld %ld\n",rtc.tv_sec,rtc.tv_nsec,diff_nsec);
                 //fprintf(file, "%ld,%09ld\n",diff_sec,diff_nsec);
-                fprintf(file, "%ld\n",diff_nsec);
+                //fprintf(file, "%ld\n",diff_nsec);
         }
         fclose(file);
         ot.tv_nsec = rtc.tv_nsec;
         ot.tv_sec = rtc.tv_sec;
         }
-        pthread_mutex_lock(&mtx);
-        input_flag = 1;
-        sample_flag = 0;
-        pthread_cond_signal(&condition_input);
-        pthread_mutex_unlock(&mtx); 
+        // pthread_mutex_lock(&mtx);
+        // input_flag = 1;
+        // sample_flag = 0;
+        // pthread_cond_signal(&condition_input);
+        // pthread_mutex_unlock(&mtx); 
         }
         return NULL;
 }
